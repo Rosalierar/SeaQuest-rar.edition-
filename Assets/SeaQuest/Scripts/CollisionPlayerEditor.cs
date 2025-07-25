@@ -27,7 +27,8 @@ public class CollisionPlayerEditor : Editor
         {
             GUILayout.Space(10);
             EditorGUILayout.BeginVertical("helpbox");
-            //script.centro2 = (Transform)EditorGUILayout.ObjectField("Centro", script.centro2, typeof(Transform), true);
+            
+            //script.posObjX = EditorGUILayout.IntPopup("Pos Obj X", script.posObjX);
             EditorGUILayout.EndVertical();  
         }
 
@@ -45,7 +46,7 @@ public class CollisionPlayerEditor : Editor
         {
             GUILayout.Space(10);
             EditorGUILayout.BeginVertical("helpbox");
-            //script.centro2 = (Transform)EditorGUILayout.ObjectField("Centro", script.centro2, typeof(Transform), true);
+
             EditorGUILayout.EndVertical();  
         }
 

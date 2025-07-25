@@ -14,6 +14,7 @@ public class ShotController : MonoBehaviour
     [Header("PONTUATION")]
     [SerializeField] TextMeshProUGUI textPontuation;
     [SerializeField] int pontuationInText;
+    int lastPontuation = 0;
     public int pontuationForShot = 20;
 
     public void SetDir(int dir)
@@ -32,11 +33,25 @@ public class ShotController : MonoBehaviour
     {
         tempo += Time.deltaTime;
         transform.position = posicaoInicial + deslocamento * tempo;
+
+        MoreDamage();
+    }
+
+    void MoreDamage()
+    {
+        pontuationInText = int.Parse(textPontuation.text);
+
+        if (pontuationInText > lastPontuation + 1000)
+        {
+            pontuationForShot = Mathf.Clamp(pontuationForShot + 10, 20, 90);
+
+            lastPontuation = pontuationInText;
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player") && !collision.CompareTag("ShotS"))
+        if (!collision.CompareTag("Player") && !collision.CompareTag("ShotS") &&  !collision.CompareTag("People"))
         {
             print("SHOT CONTROLLER: Colisao: " + collision);
             Destroy(collision.gameObject);
@@ -44,8 +59,6 @@ public class ShotController : MonoBehaviour
             pontuationInText = int.Parse(textPontuation.text);
             int result = pontuationInText + pontuationForShot;
             textPontuation.text = result.ToString();
-
-            Destroy(gameObject);
         }
 
     }

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class CollisionPlayer : MonoBehaviour
 {
+    PeopleController peopleController;
     CollisionPlayer collision1;
     LifeController lifeController;
     PlayerController player;
@@ -10,21 +11,10 @@ public class CollisionPlayer : MonoBehaviour
 
     public bool startGame; //SURFACE
 
-    [Header("PEOPLE")]
-    GameObject[] peopleObj;
-    public bool getCatch;
-    private byte maxPeople = 6;
-    [SerializeField] int currentPeopleGet = 0;
-    public GameObject parentPainelForImagePeople;
-    public Image peopleImageCanva;
-    public Sprite sprite;
-    int[] posObjX = new int[6] { -200, -120, -40, 40, -120, -200 };
-    int posY = 0;
-
-
 
     void Awake()
     {
+        peopleController = FindFirstObjectByType<PeopleController>();
         collision1 = GameObject.Find("Fundo").GetComponent<CollisionPlayer>();
         player = FindFirstObjectByType<PlayerController>();
         lifeController = FindFirstObjectByType<LifeController>();
@@ -52,19 +42,26 @@ public class CollisionPlayer : MonoBehaviour
 
                 else if (player.getPeople && startGame) // pegou alguem faz pontuação
                 {
+                    player.canMove = false;
                     print("COLLISISON PLAYER: Colocando pontuação");
+                    collision1.GetComponent<ObjectController>().ComecarResgateVisual();
                 }
 
                 startGame = true;
                 break;
 
             case TypeOfObject.People:
-                if (!player.getPeople)
-                    player.getPeople = true;
+                if (!collision1.GetComponent<ObjectController>().estacheio)
+                {
+                    if (!player.getPeople)
+                            player.getPeople = true;
 
-                lifeController.CallCoroutineSpawn();
-                collision1.startGame = false;
-                Destroy(gameObject);
+                    peopleController.restart = true;
+                    collision1.GetComponent<ObjectController>().pessoasResgatadas.Add(gameObject);
+                    collision1.GetComponent<ObjectController>().AddPeople();
+                    player.getPeople = true;
+                    Destroy(gameObject);
+                }
                 break;
 
             case TypeOfObject.Shot:
@@ -87,7 +84,7 @@ public class CollisionPlayer : MonoBehaviour
         if (whatObject == TypeOfObject.Surface && collision.CompareTag("Player"))
         {
             player.canShot = true;
-            player.getPeople = false;
+            //player.getPeople = false;
 
             lifeController.isDownSea = true;
             lifeController.tempo = 0;
@@ -97,45 +94,5 @@ public class CollisionPlayer : MonoBehaviour
         }
     }
 
-    void AddPeople()
-    {
-        int SetPeopleIndex = Mathf.Clamp(currentPeopleGet + 1, 0, maxPeople);
-        currentPeopleGet = (byte)SetPeopleIndex; 
-
-        int currentgetPeople = Mathf.Clamp(currentPeopleGet - 1, 0, maxPeople);
-        currentgetPeople = currentPeopleGet;
-
-        if (currentPeopleGet == 6 && peopleObj[currentgetPeople] != null)
-        {
-            return;
-        }
-
-        peopleObj[currentgetPeople] = new GameObject("SubPeople");
-
-        RectTransform rect = peopleObj[currentgetPeople].AddComponent<RectTransform>();
-
-        peopleObj[currentgetPeople].AddComponent<CanvasRenderer>();
-        peopleImageCanva = peopleObj[currentgetPeople].AddComponent<Image>();
-
-        peopleImageCanva.sprite = sprite;
-
-        peopleObj[currentgetPeople].transform.SetParent(parentPainelForImagePeople.transform, false);
-
-        rect.sizeDelta = new Vector2(60, 35);
-        rect.anchoredPosition = new Vector2(posObjX[currentgetPeople], posY);
-
-        print("COLLISION PLAYER: OBJECT IMAGE" + peopleObj);
-    }
-
-    void DeletePeople()
-    {
-        int currentgetPeople = Mathf.Clamp(currentPeopleGet - 1, 0, maxPeople);
-
-        currentPeopleGet = (byte)currentgetPeople;
-        Destroy(peopleObj[currentPeopleGet]);
-        player.ReSpawnController();
-
-        peopleObj[currentPeopleGet] = null;
-        print("RETIRANDO PESSOA DO CANVA");
-    }
+    
 }

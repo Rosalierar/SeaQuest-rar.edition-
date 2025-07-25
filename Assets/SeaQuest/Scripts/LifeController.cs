@@ -8,6 +8,7 @@ public class LifeController : MonoBehaviour
     public bool playing = true;
     public bool isSpawning;
     public bool isDownSea = false;
+    public GameObject painelDeafeat;
 
     [Header("OCILAÇÃO DE COR")]
     private bool lostLife = false;
@@ -119,6 +120,8 @@ public class LifeController : MonoBehaviour
                 if (lifeValue < 1)
                 {
                     handle.color = new Color(R(2), G(2), B(2));
+                    CallCoroutineSpawn();
+                    GameObject.Find("Fundo").GetComponent<CollisionPlayer>().startGame = false;
                 }
             }
             else
@@ -181,7 +184,9 @@ public class LifeController : MonoBehaviour
                     handle.color = new Color(R(1), G(1), B(1));
                 }
 
-                player.canMove = true;
+                if (!player.getPeople)
+                    player.canMove = true;
+                    //GameObject.FindAnyObjectByType<GameManager>().GetComponent<GameManager>().restartBecauseObj = true;
             }
 
             print("ISN'T DOWN SEA");
@@ -236,8 +241,14 @@ public class LifeController : MonoBehaviour
         int currentHearth = Mathf.Clamp(currentLife - 1, -1, maxLife);
 
         currentLife = (byte)currentHearth;
-        Destroy(obgLife[currentLife]);
 
+        if (currentHearth == -1)
+        {
+            painelDeafeat.SetActive(true);
+            return;
+        }
+
+        Destroy(obgLife[currentLife]);
         player.ReSpawnController();
 
         print("RETIRANDO VIDA");
